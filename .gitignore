@@ -1,6 +1,4 @@
 # Raw and generated data
-data/raw/*
-data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/processed/nhamcs_2022_visits.csv
@@ -38,3 +36,6 @@ hospital_patient_journey_weekly_plan.md
 
 # Local Codex workspace metadata
 .agents/
+
+#scripts
+generate_handoff_docs.py
