@@ -1,0 +1,39 @@
+column,csv_type,description,modelling_role
+visit_id,int64,Project-generated unique identifier for each sampled ED visit.,Identifier/analysis metadata; exclude from ML features
+visit_month,int64,Calendar month of the visit (1–12).,Candidate arrival-time feature
+visit_day,str,Day of week of the visit.,Candidate arrival-time feature
+arrival_time,string,ED arrival time in HHMM format.,Candidate arrival-time feature
+arrival_hour,float64,"Hour of ED arrival (0–23), derived from arrival_time.",Candidate arrival-time feature
+wait_time_minutes,float64,Minutes from ED arrival to first physician/APRN/PA contact.,Target/measurement
+visit_length_minutes,float64,Total length of the ED visit in minutes.,Post-arrival outcome; exclude from wait prediction
+age_years,int64,Patient age in years; age 94 includes patients aged 94 and over.,Candidate arrival-time feature
+pain_scale,float64,Patient-reported pain score from 0 to 10.,Candidate arrival-time feature
+pulse_bpm,float64,Arrival pulse in beats per minute.,Candidate arrival-time feature
+respiratory_rate,float64,Arrival respiratory rate in breaths per minute.,Candidate arrival-time feature
+systolic_bp,float64,Arrival systolic blood pressure in mmHg.,Candidate arrival-time feature
+diastolic_bp,float64,Arrival diastolic blood pressure in mmHg.,Candidate arrival-time feature
+oxygen_saturation,float64,Arrival pulse oximetry percentage.,Candidate arrival-time feature
+chronic_condition_count,float64,Number of recorded chronic conditions.,Candidate arrival-time feature
+diagnosis_count,float64,Number of diagnoses recorded for the visit.,Post-arrival outcome; exclude from wait prediction
+procedure_count,float64,Number of procedures recorded for the visit.,Post-arrival outcome; exclude from wait prediction
+survey_visit_weight,float64,NHAMCS survey weight used to estimate national visit totals.,Identifier/analysis metadata; exclude from ML features
+temperature_f,float64,Arrival temperature in degrees Fahrenheit.,Candidate arrival-time feature
+sex,str,Patient sex recorded as Female or Male in the source file.,Candidate arrival-time feature
+residence_type,str,Patient residence category before the visit.,Candidate arrival-time feature
+arrival_by_ambulance,str,Whether the patient arrived by ambulance.,Candidate arrival-time feature
+ambulance_transfer,str,Whether an ambulance arrival was transferred from another facility.,Candidate arrival-time feature
+triage_level,str,Recorded urgency category assigned during ED triage.,Candidate arrival-time feature
+reason_for_visit_code,float64,CDC reason-for-visit classification code.,Candidate arrival-time feature
+primary_diagnosis_code,string,Primary ICD diagnosis code recorded for the visit.,Post-arrival outcome; exclude from wait prediction
+left_without_being_seen,str,Whether the patient left before being seen.,Post-arrival outcome; exclude from wait prediction
+left_before_treatment_complete,str,Whether the patient left before treatment was complete.,Post-arrival outcome; exclude from wait prediction
+left_against_medical_advice,str,Whether the patient left against medical advice.,Post-arrival outcome; exclude from wait prediction
+died_in_ed,str,Whether the patient died in the emergency department.,Post-arrival outcome; exclude from wait prediction
+admitted_to_hospital,str,Whether the patient was admitted to the hospital.,Post-arrival outcome; exclude from wait prediction
+observation_then_hospitalized,str,Whether observation was followed by hospitalization.,Post-arrival outcome; exclude from wait prediction
+observation_then_discharged,str,Whether observation was followed by discharge.,Post-arrival outcome; exclude from wait prediction
+admission_destination,str,Hospital unit to which the patient was admitted.,Post-arrival outcome; exclude from wait prediction
+region,str,US Census region of the hospital.,Candidate arrival-time feature
+metropolitan_status,str,Whether the hospital is in a metropolitan statistical area.,Candidate arrival-time feature
+long_wait_4hr_flag,float64,1 when valid wait_time_minutes is greater than 240; otherwise 0.,Target/measurement
+extended_wait_2hr_flag,float64,1 when valid wait_time_minutes is at least 120; otherwise 0.,Target/measurement

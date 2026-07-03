@@ -1,0 +1,40 @@
+# Raw and generated data
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/processed/nhamcs_2022_visits.csv
+
+# Model artefacts and generated outputs
+outputs/models/*
+outputs/figures/*
+!outputs/models/.gitkeep
+!outputs/figures/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.ipynb_checkpoints/
+
+# Secrets and local configuration
+.env
+.streamlit/secrets.toml
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local project planning files
+week*_brief.md
+week*_brief.txt
+week*_breif.md
+week*_breif.txt
+nimi_week1_handoff.md
+hospital_patient_journey_weekly_plan.md
+
+# Local Codex workspace metadata
+.agents/
