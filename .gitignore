@@ -38,4 +38,4 @@ hospital_patient_journey_weekly_plan.md
 .agents/
 
 #scripts
-generate_handoff_docs.py
+src/generate_handoff_docs.py
