@@ -1,7 +1,10 @@
 # Raw and generated data
+data/raw/*
+data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/processed/nhamcs_2022_visits.csv
+!data/processed/nhamcs_2022_visits_clean.csv
 
 # Model artefacts and generated outputs
 outputs/models/*
@@ -27,15 +30,18 @@ venv/
 Thumbs.db
 
 # Local project planning files
-week*_brief.md
-week*_brief.txt
-week*_breif.md
-week*_breif.txt
-nimi_week1_handoff.md
-hospital_patient_journey_weekly_plan.md
+week1_brief.txt
+week1_breif.txt
+week2_brief.md
+week3_brief.md
+week4_brief.md
+week5_brief.md
+week6_brief.md
+final_review_brief.md
+Emergency_Department_Patient_Flow Analytics_weekly_plan.md
+
+# Temporary render/check files
+tmp/
 
 # Local Codex workspace metadata
 .agents/
-
-#scripts
-src/generate_handoff_docs.py

@@ -1,0 +1,40 @@
+{
+  "input_rows": 16025,
+  "output_rows": 16025,
+  "input_columns": 38,
+  "output_columns": 39,
+  "duplicate_rows_removed": 0,
+  "duplicate_visit_ids_found": 0,
+  "input_blank_cells": 57729,
+  "output_blank_cells_before_null_token": 24742,
+  "columns_filled_with_labels": {
+    "arrival_by_ambulance": "Unknown",
+    "ambulance_transfer": "Not applicable or unknown",
+    "triage_level": "Unknown",
+    "residence_type": "Unknown",
+    "admission_destination": "Not admitted or unknown",
+    "primary_diagnosis_code": "Unknown"
+  },
+  "missing_by_column_before_null_token": {
+    "pain_scale": 7055,
+    "extended_wait_2hr_flag": 2753,
+    "wait_time_minutes": 2753,
+    "long_wait_4hr_flag": 2753,
+    "diastolic_bp": 1754,
+    "systolic_bp": 1722,
+    "pulse_bpm": 1053,
+    "oxygen_saturation": 969,
+    "temperature_f": 937,
+    "respiratory_rate": 856,
+    "visit_length_minutes": 697,
+    "procedure_count": 445,
+    "chronic_condition_count": 259,
+    "arrival_hour": 243,
+    "arrival_time": 243,
+    "diagnosis_count": 225,
+    "reason_for_visit_code": 25
+  },
+  "extra_columns": [
+    "visit_month_name"
+  ]
+}

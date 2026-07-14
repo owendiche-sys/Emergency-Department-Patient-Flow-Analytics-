@@ -3,13 +3,19 @@
 ## Prepared dataset
 
 - **Source file:** `data/raw/ed2022-stata.dta`
-- **Prepared file:** `data/processed/nhamcs_2022_visits.csv`
+- **Prepared SQL handoff file:** `data/processed/nhamcs_2022_visits_clean.csv`
 - **Rows:** 16,025
-- **Columns:** 38
+- **Columns:** 39
 - **Duplicate visit IDs:** 0
 - **Preparation script:** `src/prepare_nhamcs_csv.py`
 
-The original CDC Stata file remains unchanged. The prepared CSV selects operationally useful fields, converts documented negative CDC special codes to blank values, supplies readable category labels, and creates two wait-time flags.
+The original CDC Stata file remains unchanged. The prepared SQL handoff CSV selects operationally useful fields, converts documented negative CDC special codes to blank values, supplies readable category labels, adds `visit_month_name` as a readable label, and creates two wait-time flags.
+
+## Scope implications
+
+The prepared dataset supports an **Emergency Department patient flow** project. Each row is one sampled ED visit, and the selected fields support analysis of ED arrival patterns, waiting times, triage urgency, ambulance arrival, visit length, admission outcomes, and patients leaving before care is completed.
+
+The prepared dataset does **not** include a hospital department field and does not support readmission tracking. Do not build department-comparison KPIs, department tables, `vw_department_pressure`, busiest-department charts, or readmission summaries from this dataset. Use ED operational pressure metrics instead, such as arrival-hour volume, long-wait rates, wait time by triage level, ambulance-arrival patterns, admission outcomes, and left-without-being-seen rates.
 
 ## Waiting-time checks
 

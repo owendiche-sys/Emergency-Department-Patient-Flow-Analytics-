@@ -28,4 +28,8 @@
 
 NHAMCS provides genuine patient-level emergency-department visit data with measured waiting time, arrival time, triage urgency, demographics, initial vital signs, diagnoses, procedures, and disposition. It supports SQL KPI analysis, Python EDA, and long-wait prediction.
 
-Its main limitations are the absence of a department field, survey-specific missing-value codes, and strong imbalance in the four-hour wait target. The prepared handoff table contains 16,025 rows and 38 fields. See `nhamcs_2022_data_dictionary.csv` and `nhamcs_2022_data_quality_report.md` for details.
+The dataset supports an **Emergency Department patient flow** project, not a general hospital department comparison project. Each row represents one sampled ED visit, so the valid project scope is ED operational performance: arrival patterns, waiting times, triage urgency, ambulance arrival, visit length, admission outcomes, and patients leaving before care is completed.
+
+Its main limitations are the absence of a hospital department field, lack of readmission tracking, survey-specific missing-value codes, and strong imbalance in the four-hour wait target. Because no department field is available, the project should not include department tables, department counts, average wait by department, busiest departments, or a department pressure index. Those ideas should be replaced with ED operational pressure measures such as peak arrival periods, long-wait rates, triage-level patterns, ambulance-arrival patterns, admission outcomes, and left-without-being-seen rates.
+
+The prepared SQL handoff table contains 16,025 rows and 39 fields. The additional `visit_month_name` field provides a readable month label while `visit_month` remains the sortable month number. See `nhamcs_2022_data_dictionary.csv` and `nhamcs_2022_data_quality_report.md` for details.

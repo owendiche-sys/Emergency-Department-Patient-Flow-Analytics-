@@ -1,6 +1,7 @@
 column,csv_type,description,modelling_role
 visit_id,int64,Project-generated unique identifier for each sampled ED visit.,Identifier/analysis metadata; exclude from ML features
 visit_month,int64,Calendar month of the visit (1–12).,Candidate arrival-time feature
+visit_month_name,str,Readable month label for reporting; keep visit_month for sorting.,Analysis metadata/reporting label
 visit_day,str,Day of week of the visit.,Candidate arrival-time feature
 arrival_time,string,ED arrival time in HHMM format.,Candidate arrival-time feature
 arrival_hour,float64,"Hour of ED arrival (0–23), derived from arrival_time.",Candidate arrival-time feature
