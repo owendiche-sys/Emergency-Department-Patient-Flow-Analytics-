@@ -1,0 +1,200 @@
+{
+  "summary": {
+    "rows": 16025,
+    "columns": 39,
+    "duplicates_visit_id": 0,
+    "valid_wait_times": 13272,
+    "missing_wait_times": 2753,
+    "avg_wait": 36.0,
+    "median_wait": 14.0,
+    "avg_visit_length": 298.6,
+    "median_visit_length": 191.0,
+    "long_wait_4hr": 238,
+    "extended_wait_2hr": 907,
+    "long_wait_4hr_rate_valid_wait": 1.79,
+    "extended_wait_2hr_rate_valid_wait": 6.83,
+    "busiest_month": "February",
+    "busiest_month_visits": 1619,
+    "busiest_day": "Monday",
+    "busiest_day_visits": 2631,
+    "busiest_hour": 10,
+    "busiest_hour_visits": 1017,
+    "admitted_to_hospital_yes": 2121,
+    "admitted_to_hospital_rate": 13.24,
+    "observation_then_hospitalized_yes": 177,
+    "observation_then_hospitalized_rate": 1.1,
+    "observation_then_discharged_yes": 214,
+    "observation_then_discharged_rate": 1.34,
+    "left_without_being_seen_yes": 327,
+    "left_without_being_seen_rate": 2.04,
+    "left_before_treatment_complete_yes": 221,
+    "left_before_treatment_complete_rate": 1.38,
+    "arrival_by_ambulance_yes": 2848,
+    "arrival_by_ambulance_rate": 17.77
+  },
+  "groups": {
+    "triage_level": [
+      {
+        "triage_level": "Emergent",
+        "count": 1354,
+        "mean": 28.5,
+        "median": 12.0
+      },
+      {
+        "triage_level": "Facility does not conduct triage",
+        "count": 916,
+        "mean": 35.9,
+        "median": 19.0
+      },
+      {
+        "triage_level": "Immediate",
+        "count": 112,
+        "mean": 24.9,
+        "median": 9.5
+      },
+      {
+        "triage_level": "No triage",
+        "count": 426,
+        "mean": 45.3,
+        "median": 18.0
+      },
+      {
+        "triage_level": "Nonurgent",
+        "count": 263,
+        "mean": 30.8,
+        "median": 13.0
+      },
+      {
+        "triage_level": "Semi-urgent",
+        "count": 2384,
+        "mean": 35.5,
+        "median": 15.0
+      },
+      {
+        "triage_level": "Unknown",
+        "count": 3292,
+        "mean": 37.1,
+        "median": 13.0
+      },
+      {
+        "triage_level": "Urgent",
+        "count": 4525,
+        "mean": 37.6,
+        "median": 15.0
+      }
+    ],
+    "arrival_by_ambulance": [
+      {
+        "arrival_by_ambulance": "No",
+        "count": 10607,
+        "mean": 37.6,
+        "median": 16.0
+      },
+      {
+        "arrival_by_ambulance": "Unknown",
+        "count": 274,
+        "mean": 38.6,
+        "median": 16.0
+      },
+      {
+        "arrival_by_ambulance": "Yes",
+        "count": 2391,
+        "mean": 28.7,
+        "median": 10.0
+      }
+    ],
+    "sex": [
+      {
+        "sex": "Female",
+        "count": 7065,
+        "mean": 36.9,
+        "median": 15.0
+      },
+      {
+        "sex": "Male",
+        "count": 6207,
+        "mean": 35.1,
+        "median": 14.0
+      }
+    ],
+    "region": [
+      {
+        "region": "Midwest",
+        "count": 3869,
+        "mean": 32.7,
+        "median": 10.0
+      },
+      {
+        "region": "Northeast",
+        "count": 2624,
+        "mean": 43.3,
+        "median": 17.5
+      },
+      {
+        "region": "South",
+        "count": 3713,
+        "mean": 41.2,
+        "median": 20.0
+      },
+      {
+        "region": "West",
+        "count": 3066,
+        "mean": 27.7,
+        "median": 12.0
+      }
+    ],
+    "metropolitan_status": [
+      {
+        "metropolitan_status": "Metropolitan",
+        "count": 11747,
+        "mean": 36.8,
+        "median": 15.0
+      },
+      {
+        "metropolitan_status": "Non-metropolitan",
+        "count": 1525,
+        "mean": 29.8,
+        "median": 12.0
+      }
+    ],
+    "age_group": [
+      {
+        "age_group": "0-17",
+        "count": 2795,
+        "mean": 39.3,
+        "median": 17.0
+      },
+      {
+        "age_group": "18-34",
+        "count": 3107,
+        "mean": 34.9,
+        "median": 14.0
+      },
+      {
+        "age_group": "35-49",
+        "count": 2228,
+        "mean": 37.5,
+        "median": 16.0
+      },
+      {
+        "age_group": "50-64",
+        "count": 2388,
+        "mean": 35.2,
+        "median": 13.0
+      },
+      {
+        "age_group": "65+",
+        "count": 2754,
+        "mean": 33.5,
+        "median": 12.0
+      }
+    ]
+  },
+  "figures": [
+    "ed_visits_by_day.png",
+    "ed_visits_by_hour.png",
+    "ed_visits_by_month.png",
+    "median_wait_by_triage.png",
+    "wait_time_distribution_thresholds.png"
+  ]
+}

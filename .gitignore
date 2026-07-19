@@ -11,6 +11,11 @@ outputs/models/*
 outputs/figures/*
 !outputs/models/.gitkeep
 !outputs/figures/.gitkeep
+!outputs/figures/ed_visits_by_month.png
+!outputs/figures/ed_visits_by_day.png
+!outputs/figures/ed_visits_by_hour.png
+!outputs/figures/wait_time_distribution_thresholds.png
+!outputs/figures/median_wait_by_triage.png
 
 # Python
 __pycache__/
