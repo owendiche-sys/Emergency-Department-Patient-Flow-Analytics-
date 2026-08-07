@@ -59,6 +59,57 @@ This project builds an ED patient flow analytics workflow that uses SQL, Python,
 - scikit-learn for extended-wait prediction
 - Streamlit for the final dashboard
 
+## SQL analytical views
+
+The SQL phase includes reusable views for reporting, dashboard development, and ML feature preparation:
+
+- `vw_ed_patient_flow_summary`
+- `vw_ed_wait_kpis`
+- `vw_ed_triage_flow`
+- `vw_ed_outcomes`
+- `vw_business_question_metrics`
+- `vw_ml_wait_features`
+- `vw_ambulance_summary`
+- `vw_region_summary`
+- `vw_monthly_summary`
+- `vw_day_summary`
+- `vw_arrival_hour_summary`
+
+The monthly, day, and arrival-hour views extend the original plan by separating arrival-pattern reporting into reusable summaries.
+
+## Dashboard pages
+
+The Streamlit dashboard is organised around ED operations:
+
+- Overview
+- ED Patient Flow
+- Waiting Time Analysis
+- Triage and Acuity
+- Outcomes
+- SQL Insights
+- ML Prediction
+- Business Recommendations
+
+The current dashboard draft reads from `data/processed/nhamcs_2022_visits_clean.csv` and is structured to align with the SQL views.
+
+## Machine learning workflow
+
+The ML workflow predicts extended ED waits using arrival-time or near-arrival features. The primary target is `extended_wait_2hr_flag` because the 4-hour target is much more imbalanced.
+
+Post-arrival fields such as wait time, visit length, admission status, observation outcomes, and leaving-before-care outcomes are excluded as prediction features.
+
+Run the Week 5 model comparison with:
+
+```bash
+python src/train_wait_prediction_models.py
+```
+
+Run the dashboard with:
+
+```bash
+streamlit run dashboard/app.py
+```
+
 ## Repository structure
 
 ```text

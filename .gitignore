@@ -10,6 +10,8 @@ data/processed/*
 outputs/models/*
 outputs/figures/*
 !outputs/models/.gitkeep
+!outputs/models/week5_wait_prediction_model_metrics.csv
+!outputs/models/week5_wait_target_balance.csv
 !outputs/figures/.gitkeep
 !outputs/figures/ed_visits_by_month.png
 !outputs/figures/ed_visits_by_day.png
@@ -44,6 +46,7 @@ week5_brief.md
 week6_brief.md
 final_review_brief.md
 Emergency_Department_Patient_Flow Analytics_weekly_plan.md
+ed_operations_early_insights.md
 owen_week4_catchup_notes.md
 
 # Temporary render/check files
