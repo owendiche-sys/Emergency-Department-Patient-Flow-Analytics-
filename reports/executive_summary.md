@@ -6,6 +6,8 @@ This project analyses emergency-department patient flow using the 2022 NHAMCS Em
 
 The scope is deliberately limited to an ED visit episode. The source data does not contain a hospital-department field or patient-level readmission tracking, so the project does not make department comparisons or readmission claims.
 
+Live DashBoard : https://emergency-department-patient-flow-analytics.streamlit.app/
+
 ## Data foundation
 
 The analytical dataset contains 16,025 sampled ED visits and 39 selected fields. Validation found:

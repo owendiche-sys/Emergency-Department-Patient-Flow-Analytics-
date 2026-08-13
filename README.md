@@ -67,7 +67,7 @@ The deployed dashboard intentionally reads the committed clean CSV so it can run
 
 ## Dashboard
 
-Live DashBoard : 
+Live DashBoard : https://emergency-department-patient-flow-analytics.streamlit.app/
 
 The Streamlit application contains eight sections:
 
