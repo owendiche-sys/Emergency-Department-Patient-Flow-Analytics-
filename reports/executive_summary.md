@@ -1,56 +1,48 @@
 # Executive Summary
 
-## Project Purpose
+## Purpose
 
-This project analyses Emergency Department patient flow using the 2022 NHAMCS Emergency Department public-use dataset. The goal is to identify operational pressure patterns, measure waiting-time and outcome KPIs, and provide practical recommendations for ED management.
+This project analyses emergency-department patient flow using the 2022 NHAMCS Emergency Department Public Use File. It combines SQL, Python, machine learning, and an interactive dashboard to identify arrival patterns, measure waiting and outcome KPIs, and translate descriptive evidence into management recommendations.
 
-The original broader hospital journey idea was narrowed to ED patient flow because the dataset represents ED visits and does not include a hospital department field.
+The scope is deliberately limited to an ED visit episode. The source data does not contain a hospital-department field or patient-level readmission tracking, so the project does not make department comparisons or readmission claims.
 
-## Key Dataset Facts
+## Data foundation
 
-- 16,025 sampled ED visits.
-- 13,272 visits with valid wait-time values.
-- 907 visits waited more than 2 hours.
-- 238 visits waited more than 4 hours.
-- Each row represents one sampled ED visit, not a full inpatient journey.
+The analytical dataset contains 16,025 sampled ED visits and 39 selected fields. Validation found:
 
-## Early Findings
+- 16,025 unique visit IDs and no duplicate IDs.
+- 13,272 visits with a valid wait time and 2,753 without one.
+- 907 visits meeting the 2-hour extended-wait definition (`>= 120` minutes).
+- 238 visits meeting the 4-hour long-wait definition (`> 240` minutes).
 
-- Median ED wait time is 14 minutes.
-- Average ED wait time is 36.0 minutes.
-- The 2-hour extended-wait rate is 6.83% among visits with valid waits.
-- The 4-hour long-wait rate is 1.79% among visits with valid waits.
-- February has the highest visit volume in the current sample.
-- Monday is the busiest arrival day.
-- 10:00 is the busiest arrival hour.
-- Ambulance arrivals have lower median waits than non-ambulance arrivals, which is consistent with triage prioritisation.
-- Metropolitan visits and some regions show higher median waits, suggesting useful operational segmentation.
+The dashboard and report present unweighted sample statistics. NHAMCS survey weights are retained but are not applied, so the results should not be interpreted as national population estimates.
 
-## Machine Learning Summary
+## Principal findings
 
-The first modelling workflow predicts whether a visit is likely to exceed a 2-hour wait. The 2-hour flag is the primary ML target because it has more positive cases than the 4-hour flag and is less severely imbalanced.
+- Median wait was 14 minutes and average wait was 36.0 minutes, indicating a right-skewed distribution driven by a smaller group of long waits.
+- The 2-hour extended-wait rate was 6.83% and the 4-hour long-wait rate was 1.79% among visits with a valid wait.
+- Average visit length was 298.6 minutes and median visit length was 191 minutes.
+- February had the highest sampled visit volume, Monday was the busiest arrival day, and 10:00 was the busiest arrival hour.
+- Ambulance arrivals had a lower median wait than non-ambulance arrivals, consistent with urgency-based prioritisation.
+- Metropolitan visits and the Northeast and South regions had higher descriptive median waits than their comparison groups in this sample.
+- The admission rate was 13.24%, the left-without-being-seen rate was 2.04%, and the left-before-treatment-complete rate was 1.38%.
 
-The model uses arrival-time or near-arrival features only. Post-arrival outcomes such as admission status, visit length, observation outcomes, and leaving-before-care outcomes are excluded from the feature list.
+These patterns are descriptive. They identify areas for operational review but do not establish causal relationships.
 
-## Dashboard Summary
+## Model result
 
-The Streamlit dashboard currently includes:
+The model predicts whether a visit will meet the 2-hour extended-wait threshold using only arrival-time or near-arrival features. Post-arrival outcomes, raw wait time, visit duration, diagnoses, and procedures are excluded to prevent leakage.
 
-- Overview
-- ED Patient Flow
-- Waiting Time Analysis
-- Triage and Acuity
-- Outcomes
-- SQL Insights
-- ML Prediction
-- Business Recommendations
+The balanced Random Forest was the strongest tested classifier, with accuracy 0.794, precision 0.164, recall 0.492, F1 0.246, and ROC-AUC 0.715. It offers useful analytical discrimination, but limited precision makes it unsuitable for automated operational or clinical decisions.
 
-The dashboard uses the cleaned CSV for the current draft and is structured around the SQL views in `sql/05_views_for_python.sql`.
+## Recommendations
 
-## Management Recommendations
+1. Use recurring arrival-hour, day, and month patterns to review roster coverage and escalation readiness before predictable peaks.
+2. Track the 2-hour rate as an early pressure signal and the 4-hour rate as a stricter escalation indicator.
+3. Segment operational reviews by triage, ambulance arrival, region, and metropolitan status to identify where local investigation is needed.
+4. Review admission, observation, left-without-being-seen, and treatment-completion outcomes alongside waiting measures.
+5. Validate all proposed operational changes against recent local hospital data before implementation.
 
-- Use predictable arrival peaks to support staffing and operational readiness.
-- Monitor 2-hour and 4-hour wait thresholds separately because they represent different pressure levels.
-- Track wait variation by triage, ambulance arrival, region, and metropolitan status.
-- Use admission, observation, and leaving-before-care outcomes for reporting, not arrival-time prediction.
-- Treat the ML model as an analytical prototype, not a clinical or operational decision tool.
+## Final deliverable
+
+The repository provides a reproducible SQL and Python workflow, validated analytical data, model evaluation, publication-ready figures, final reports, and a deployment-ready Streamlit dashboard. It is an analytical portfolio project and decision-support demonstration, not a clinical system.

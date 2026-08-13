@@ -13,8 +13,10 @@ CREATE DATABASE IF NOT EXISTS ed_patient_flow_analytics;
 -- Set the newly created database as the active database
 USE ed_patient_flow_analytics;
 
--- Create the staging table for raw CSV import
-CREATE TABLE IF NOT EXISTS staging_ed_visits (
+-- Recreate the staging table so the pipeline can be run safely from scratch.
+DROP TABLE IF EXISTS staging_ed_visits;
+
+CREATE TABLE staging_ed_visits (
 
     visit_id                         VARCHAR(255),
     visit_month                      VARCHAR(255),

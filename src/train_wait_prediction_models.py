@@ -1,3 +1,8 @@
+"""Train and evaluate leakage-controlled extended-wait classifiers."""
+
+from __future__ import annotations
+
+import json
 from pathlib import Path
 
 import joblib
@@ -9,6 +14,8 @@ from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import (
     accuracy_score,
+    average_precision_score,
+    balanced_accuracy_score,
     confusion_matrix,
     f1_score,
     precision_score,
@@ -25,7 +32,6 @@ DATA_PATH = PROJECT_ROOT / "data" / "processed" / "nhamcs_2022_visits_clean.csv"
 OUTPUT_DIR = PROJECT_ROOT / "outputs" / "models"
 
 TARGET = "extended_wait_2hr_flag"
-
 FEATURES = [
     "visit_month",
     "visit_day",
@@ -47,7 +53,6 @@ FEATURES = [
     "region",
     "metropolitan_status",
 ]
-
 LEAKAGE_FIELDS = {
     "wait_time_minutes",
     "visit_length_minutes",
@@ -63,8 +68,13 @@ LEAKAGE_FIELDS = {
 
 
 def load_model_data() -> pd.DataFrame:
+    """Load visits with a known modelling target."""
     df = pd.read_csv(DATA_PATH, na_values=["NULL", "", " "])
-    model_df = df[df["wait_time_minutes"].notna()].copy()
+    missing = sorted(set(FEATURES + [TARGET, "long_wait_4hr_flag"]) - set(df.columns))
+    if missing:
+        raise ValueError(f"Model data is missing required columns: {missing}")
+
+    model_df = df[df[TARGET].notna()].copy()
     model_df[TARGET] = model_df[TARGET].astype(int)
     return model_df
 
@@ -79,14 +89,12 @@ def build_preprocessor(df: pd.DataFrame) -> ColumnTransformer:
             ("scaler", StandardScaler()),
         ]
     )
-
     categorical_pipeline = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="most_frequent")),
             ("onehot", OneHotEncoder(handle_unknown="ignore")),
         ]
     )
-
     return ColumnTransformer(
         transformers=[
             ("numeric", numeric_pipeline, numeric_features),
@@ -95,57 +103,16 @@ def build_preprocessor(df: pd.DataFrame) -> ColumnTransformer:
     )
 
 
-def evaluate_model(name, model, x_train, x_test, y_train, y_test) -> dict:
-    model.fit(x_train, y_train)
-    predictions = model.predict(x_test)
-
-    metrics = {
-        "model": name,
-        "accuracy": accuracy_score(y_test, predictions),
-        "precision": precision_score(y_test, predictions, zero_division=0),
-        "recall": recall_score(y_test, predictions, zero_division=0),
-        "f1": f1_score(y_test, predictions, zero_division=0),
-        "roc_auc": None,
-    }
-
-    if hasattr(model, "predict_proba"):
-        probabilities = model.predict_proba(x_test)[:, 1]
-        metrics["roc_auc"] = roc_auc_score(y_test, probabilities)
-
-    tn, fp, fn, tp = confusion_matrix(y_test, predictions).ravel()
-    metrics.update({"true_negative": tn, "false_positive": fp, "false_negative": fn, "true_positive": tp})
-
-    return metrics
-
-
-def main() -> None:
-    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-    if set(FEATURES).intersection(LEAKAGE_FIELDS):
-        raise ValueError("Feature list contains post-arrival leakage fields.")
-
-    model_df = load_model_data()
-    x = model_df[FEATURES]
-    y = model_df[TARGET]
-
-    x_train, x_test, y_train, y_test = train_test_split(
-        x,
-        y,
-        test_size=0.2,
-        random_state=42,
-        stratify=y,
-    )
-
-    preprocessor = build_preprocessor(model_df)
-
-    models = [
+def build_models(df: pd.DataFrame) -> list[tuple[str, object]]:
+    """Build independent pipelines so model fits cannot share transformer state."""
+    return [
         ("majority_class_baseline", DummyClassifier(strategy="most_frequent")),
         (
             "logistic_regression_balanced",
             Pipeline(
                 steps=[
-                    ("preprocessor", preprocessor),
-                    ("model", LogisticRegression(max_iter=1000, class_weight="balanced")),
+                    ("preprocessor", build_preprocessor(df)),
+                    ("model", LogisticRegression(max_iter=1000, class_weight="balanced", random_state=42)),
                 ]
             ),
         ),
@@ -153,7 +120,7 @@ def main() -> None:
             "random_forest_balanced",
             Pipeline(
                 steps=[
-                    ("preprocessor", preprocessor),
+                    ("preprocessor", build_preprocessor(df)),
                     (
                         "model",
                         RandomForestClassifier(
@@ -169,13 +136,84 @@ def main() -> None:
         ),
     ]
 
+
+def evaluate_model(name, model, x_train, x_test, y_train, y_test) -> dict[str, float | int | str]:
+    model.fit(x_train, y_train)
+    predictions = model.predict(x_test)
+
+    metrics: dict[str, float | int | str] = {
+        "model": name,
+        "accuracy": accuracy_score(y_test, predictions),
+        "balanced_accuracy": balanced_accuracy_score(y_test, predictions),
+        "precision": precision_score(y_test, predictions, zero_division=0),
+        "recall": recall_score(y_test, predictions, zero_division=0),
+        "f1": f1_score(y_test, predictions, zero_division=0),
+        "roc_auc": 0.5,
+        "pr_auc": float(y_test.mean()),
+    }
+    if hasattr(model, "predict_proba"):
+        probabilities = model.predict_proba(x_test)[:, 1]
+        metrics["roc_auc"] = roc_auc_score(y_test, probabilities)
+        metrics["pr_auc"] = average_precision_score(y_test, probabilities)
+
+    tn, fp, fn, tp = confusion_matrix(y_test, predictions, labels=[0, 1]).ravel()
+    metrics.update(
+        {
+            "true_negative": int(tn),
+            "false_positive": int(fp),
+            "false_negative": int(fn),
+            "true_positive": int(tp),
+        }
+    )
+    return metrics
+
+
+def write_feature_importance(model: Pipeline) -> None:
+    preprocessor = model.named_steps["preprocessor"]
+    estimator = model.named_steps["model"]
+    feature_names = preprocessor.get_feature_names_out()
+
+    if hasattr(estimator, "feature_importances_"):
+        importance = estimator.feature_importances_
+    elif hasattr(estimator, "coef_"):
+        importance = abs(estimator.coef_[0])
+    else:
+        return
+
+    feature_frame = (
+        pd.DataFrame({"feature": feature_names, "importance": importance})
+        .sort_values("importance", ascending=False)
+        .reset_index(drop=True)
+    )
+    feature_frame.to_csv(OUTPUT_DIR / "wait_prediction_feature_importance.csv", index=False)
+
+
+def main() -> None:
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    if set(FEATURES).intersection(LEAKAGE_FIELDS):
+        raise ValueError("Feature list contains post-arrival leakage fields.")
+
+    model_df = load_model_data()
+    x = model_df[FEATURES]
+    y = model_df[TARGET]
+    x_train, x_test, y_train, y_test = train_test_split(
+        x,
+        y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y,
+    )
+
+    models = build_models(model_df)
     results = [evaluate_model(name, model, x_train, x_test, y_train, y_test) for name, model in models]
     metrics_df = pd.DataFrame(results)
-    metrics_df.to_csv(OUTPUT_DIR / "week5_wait_prediction_model_metrics.csv", index=False)
+    metrics_df.to_csv(OUTPUT_DIR / "wait_prediction_model_metrics.csv", index=False)
 
-    best_model_name = metrics_df.sort_values(["f1", "roc_auc"], ascending=False).iloc[0]["model"]
+    best_model_name = metrics_df.sort_values(["f1", "pr_auc", "recall"], ascending=False).iloc[0]["model"]
     best_model = dict(models)[best_model_name]
-    joblib.dump(best_model, OUTPUT_DIR / "week5_best_wait_prediction_model.joblib")
+    joblib.dump(best_model, OUTPUT_DIR / "wait_prediction_model.joblib")
+    if isinstance(best_model, Pipeline):
+        write_feature_importance(best_model)
 
     target_summary = pd.DataFrame(
         {
@@ -190,10 +228,24 @@ def main() -> None:
             ],
         }
     )
-    target_summary.to_csv(OUTPUT_DIR / "week5_wait_target_balance.csv", index=False)
+    target_summary.to_csv(OUTPUT_DIR / "wait_target_balance.csv", index=False)
+
+    metadata = {
+        "target": TARGET,
+        "features": FEATURES,
+        "excluded_post_arrival_fields": sorted(LEAKAGE_FIELDS),
+        "training_rows": len(x_train),
+        "test_rows": len(x_test),
+        "test_size": 0.2,
+        "random_state": 42,
+        "selected_model": best_model_name,
+    }
+    (OUTPUT_DIR / "wait_prediction_metadata.json").write_text(
+        json.dumps(metadata, indent=2), encoding="utf-8"
+    )
 
     print(metrics_df.to_string(index=False))
-    print(f"Best model saved: {best_model_name}")
+    print(f"Selected model: {best_model_name}")
 
 
 if __name__ == "__main__":

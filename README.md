@@ -1,164 +1,200 @@
 # Emergency Department Patient Flow Analytics
 
-## Project overview
+An end-to-end healthcare analytics project using the **2022 National Hospital Ambulatory Medical Care Survey (NHAMCS) Emergency Department Public Use File**. The project combines reproducible data preparation, MySQL analytics, Python exploratory analysis, machine learning, and an interactive Streamlit dashboard to examine emergency-department demand, waiting performance, patient acuity, and outcomes.
 
-This project uses the **2022 National Hospital Ambulatory Medical Care Survey (NHAMCS) Emergency Department Public Use File** to analyse ED visit patterns, waiting times, triage urgency, ambulance arrivals, admission outcomes, and patients leaving before care is completed.
+## Project outcome
 
-The project was originally planned as a broader hospital patient journey analysis. After validating the selected dataset, the scope was narrowed to ED patient flow because each row represents one sampled emergency-department visit and the data does not include a hospital department field.
+The final project provides:
 
-## Why Emergency Department?
+- A validated 16,025-visit analytical dataset with 39 selected variables.
+- MySQL staging, typed-table, KPI, validation, and reusable-view scripts.
+- Python exploratory analysis and reproducible exported figures.
+- A leakage-controlled model comparison for predicting 2-hour extended waits.
+- A responsive Streamlit dashboard with filters, accessible charts, model evaluation, SQL documentation, and management recommendations.
+- Final executive and business-insight reports.
 
-Emergency departments are high-pressure entry points into hospital care. They manage unpredictable arrivals, urgent triage decisions, ambulance arrivals, long-wait risk, admission flow, and patients who may leave before care is completed.
+## Key findings
 
-The selected NHAMCS dataset directly supports this ED-focused analysis because it includes arrival timing, waiting time, triage level, ambulance arrival, visit length, admission outcomes, and departure-related indicators. It does **not** support comparing hospital departments, so this project does not make department-pressure claims.
+| Measure | Result |
+|---|---:|
+| Sampled ED visits | 16,025 |
+| Visits with a valid wait time | 13,272 |
+| Average wait | 36.0 minutes |
+| Median wait | 14 minutes |
+| Average visit length | 298.6 minutes |
+| Median visit length | 191 minutes |
+| 2-hour extended-wait rate | 6.83% of valid waits |
+| 4-hour long-wait rate | 1.79% of valid waits |
+| Admission rate | 13.24% |
+| Left-without-being-seen rate | 2.04% |
+| Ambulance-arrival rate | 17.77% |
 
-## Problem statement
+The busiest observed month was February, the busiest arrival day was Monday, and 10:00 was the highest-volume arrival hour. Waiting time was right-skewed: most sampled visits had short waits, while a smaller group experienced very long waits.
 
-Emergency departments often experience operational pressure caused by fluctuating arrivals, long waits, triage demand, ambulance arrivals, admission bottlenecks, and patients leaving before care is completed. Without a clear analytics workflow, it can be difficult for hospital managers to identify peak pressure periods, understand which patient groups experience longer waits, and communicate evidence-based recommendations.
-
-This project builds an ED patient flow analytics workflow that uses SQL, Python, machine learning, and dashboard reporting to monitor ED operational KPIs and support practical management recommendations.
-
-## Project goals
-
-- Measure ED patient volume, waiting times, visit length, admission outcomes, and departure patterns.
-- Identify busy arrival periods and signs of ED operational pressure.
-- Analyse how wait times vary by triage level, arrival period, ambulance arrival, age group, sex, region, and metropolitan status.
-- Compare 2-hour and 4-hour wait thresholds.
-- Predict extended patient waiting times using arrival-time or near-arrival features.
-- Turn findings into practical recommendations for hospital management.
+![ED visits by arrival hour](outputs/figures/ed_visits_by_hour.png)
 
 ## Business questions
 
-- When are ED visits highest by month, day, and arrival hour?
-- What are the average and median ED wait times?
-- What percentage of patients wait more than 2 hours or 4 hours?
-- Which triage levels and patient groups experience longer waits?
-- How do ambulance arrivals differ from non-ambulance arrivals?
-- What proportion of ED visits result in admission, observation, discharge-related outcomes, or patients leaving before care is completed?
-- Which time periods show the strongest signs of ED operational pressure?
-- Can arrival-time information help predict whether a patient is at risk of an extended wait?
+The analysis addresses the following operational questions:
 
-## Core KPIs
+1. When are sampled ED arrivals highest by month, day, and hour?
+2. What are the average and median waiting and visit-length measures?
+3. What share of valid waits meet the 2-hour and 4-hour thresholds?
+4. How does waiting vary by triage level, ambulance arrival, age group, sex, region, and metropolitan status?
+5. What proportion of sampled visits result in admission, observation, or patients leaving before care is completed?
+6. Which time periods show the strongest descriptive indicators of ED operational pressure?
+7. Can arrival-time and near-arrival information help identify extended-wait risk?
 
-- Total ED visits
-- Average and median wait time
-- Average and median visit length
-- 2-hour extended-wait rate
-- 4-hour long-wait rate
-- Admission rate
-- Left-without-being-seen rate
-- Left-before-treatment-complete rate
-- Ambulance-arrival rate
-- Visits by month, day, and arrival hour
-- Wait time by triage level, arrival period, ambulance arrival, age group, sex, region, and metropolitan status
+Detailed findings and recommendations are available in [business_insights.md](reports/business_insights.md) and [executive_summary.md](reports/executive_summary.md).
 
-## Planned stack
+## Analytical architecture
 
-- SQL for data modelling, cleaning, KPIs, and reusable views
-- Python for exploratory analysis and visualisation
-- scikit-learn for extended-wait prediction
-- Streamlit for the final dashboard
-
-## SQL analytical views
-
-The SQL phase includes reusable views for reporting, dashboard development, and ML feature preparation:
-
-- `vw_ed_patient_flow_summary`
-- `vw_ed_wait_kpis`
-- `vw_ed_triage_flow`
-- `vw_ed_outcomes`
-- `vw_business_question_metrics`
-- `vw_ml_wait_features`
-- `vw_ambulance_summary`
-- `vw_region_summary`
-- `vw_monthly_summary`
-- `vw_day_summary`
-- `vw_arrival_hour_summary`
-
-The monthly, day, and arrival-hour views extend the original plan by separating arrival-pattern reporting into reusable summaries.
-
-## Dashboard pages
-
-The Streamlit dashboard is organised around ED operations:
-
-- Overview
-- ED Patient Flow
-- Waiting Time Analysis
-- Triage and Acuity
-- Outcomes
-- SQL Insights
-- ML Prediction
-- Business Recommendations
-
-The current dashboard draft reads from `data/processed/nhamcs_2022_visits_clean.csv` and is structured to align with the SQL views.
-
-## Machine learning workflow
-
-The ML workflow predicts extended ED waits using arrival-time or near-arrival features. The primary target is `extended_wait_2hr_flag` because the 4-hour target is much more imbalanced.
-
-Post-arrival fields such as wait time, visit length, admission status, observation outcomes, and leaving-before-care outcomes are excluded as prediction features.
-
-Run the Week 5 model comparison with:
-
-```bash
-python src/train_wait_prediction_models.py
+```text
+CDC/NCHS Stata source
+        |
+        v
+Python preparation and cleaning
+        |
+        +--> Clean analytical CSV --> Python EDA --> Figures and reports
+        |                              |
+        |                              +--> Model comparison and metrics
+        |                              +--> Streamlit dashboard
+        |
+        +--> MySQL staging --> Typed ed_visits table --> KPI queries and views
 ```
 
-Run the dashboard with:
+The deployed dashboard intentionally reads the committed clean CSV so it can run without database credentials. The MySQL layer independently reproduces the same analytical table, KPI definitions, and modelling feature contract.
+
+## Dashboard
+
+Live DashBoard : 
+
+The Streamlit application contains eight sections:
+
+- Overview
+- Patient Flow
+- Waiting Times
+- Triage & Groups
+- Outcomes
+- Data & SQL
+- ML Evaluation
+- Recommendations
+
+Filters cover month, arrival day and hour, triage, ambulance arrival, region, metropolitan status, and sex. The default filter state retains visits with missing arrival-hour values, and all wait rates use visits with valid waits as their denominator.
+
+## Machine-learning result
+
+The primary target is `extended_wait_2hr_flag`, defined as a wait of at least 120 minutes. Only arrival-time or near-arrival fields are used. Visit length, raw wait time, diagnoses, procedures, admission, observation, departure outcomes, and ED death are excluded from the feature set.
+
+The balanced Random Forest is the strongest tested model:
+
+| Metric | Result |
+|---|---:|
+| Accuracy | 0.794 |
+| Precision | 0.164 |
+| Recall | 0.492 |
+| F1 | 0.246 |
+| ROC-AUC | 0.715 |
+
+The model is an analytical prototype. Its limited precision means it must not be used for clinical triage, automated staffing, or patient-level decisions.
+
+## Repository structure
+
+```text
+dashboard/          Streamlit application
+data/
+  raw/              CDC/NCHS Stata source
+  processed/        Prepared and SQL-ready analytical CSV files
+docs/               Dataset selection, data dictionary, quality report, project plan
+notebooks/          EDA and modelling notebooks
+outputs/
+  figures/          Reproducible figures
+  models/           Model metrics, target balance, metadata, feature importance
+reports/            Final executive summary and business insights
+sql/                Ordered MySQL pipeline and KPI/view scripts
+src/                Data preparation, figure generation, and model training scripts
+tests/              Standard-library integrity checks
+```
+
+## Quick start
+
+Python 3.11 or 3.12 is recommended.
+
+```bash
+python -m venv .venv
+```
+
+Activate the environment and install dependencies:
+
+```bash
+# macOS/Linux
+source .venv/bin/activate
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+
+pip install -r requirements.txt
+```
+
+Run the dashboard:
 
 ```bash
 streamlit run dashboard/app.py
 ```
 
-## Repository structure
+Regenerate the final model outputs:
 
-```text
-data/
-  raw/          # Original CDC Stata file (not committed)
-  processed/    # SQL-ready selected ED visit data
-notebooks/      # Exploratory analysis and machine-learning notebooks
-sql/            # Database setup, cleaning, KPI, and view scripts
-src/            # Reusable Python modules and generation scripts
-dashboard/      # Streamlit application
-reports/        # Executive summary and business insights
-outputs/
-  figures/      # Exported charts and dashboard screenshots
-  models/       # Saved model artefacts
-docs/           # Data dictionary, project plans, and supporting documentation
+```bash
+python src/train_wait_prediction_models.py
 ```
 
-## Dataset
+Regenerate the repository figures:
 
-The selected dataset is the **2022 National Hospital Ambulatory Medical Care Survey (NHAMCS) Emergency Department Public Use File**, published by the US Centers for Disease Control and Prevention, National Center for Health Statistics.
+```bash
+python src/generate_eda_figures.py
+```
 
-- [CDC dataset and documentation page](https://www.cdc.gov/nchs/nhamcs/documentation/index.html)
-- [2022 technical documentation (PDF)](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHAMCS/doc22-ed-508.pdf)
-- Unit of observation: one sampled emergency-department visit
-- Source data: 16,025 visits and 913 variables
-- Prepared SQL handoff data: 16,025 visits and 39 selected variables
-- Access date: 3 July 2026
-- Privacy: public-use microdata with disclosure protections and no direct patient identifiers in the selected fields
+Run integrity checks:
 
-The raw Stata file is retained locally and ignored by Git. The reproducible preparation script creates `data/processed/nhamcs_2022_visits.csv`, converts CDC special missing codes to blank values, decodes selected categories, and creates two wait-time flags.
+```bash
+python -m unittest discover -s tests -v
+```
 
-The four-hour target is available, but only 238 of 13,272 visits with valid wait times exceed 240 minutes. A two-hour target is also supplied for comparison because it has a less extreme class imbalance.
+## MySQL workflow
 
-## Scope limitations
+The SQL scripts target MySQL 8.0. Run them in numeric order from the repository root:
 
-- The dataset does not include a hospital department field, so the project does not compare departments.
-- The project analyses an ED visit episode, not the full hospital journey across multiple departments.
-- Readmission analysis is not included because the prepared dataset does not support it.
-- The machine learning model is an analytical prototype, not a clinical or operational automation tool.
-- Post-arrival outcomes such as admission status, visit length, and leaving-before-care outcomes should not be used as arrival-time prediction features.
+1. `sql/01_create_tables.sql`
+2. `sql/02_load_data.sql`
+3. `sql/03_create_final_table.sql`
+4. `sql/04_kpi_queries.sql`
+5. `sql/05_views_for_python.sql`
 
-## Team workflow
+`02_load_data.sql` uses `LOAD DATA LOCAL INFILE`. Enable local-file loading in the MySQL client and adjust the CSV path if the client is not launched from the repository root.
 
-- `main` - stable shared work
-- `feature/nimi` - SQL schema, cleaning, KPIs, and views
-- `feature/owen` - Python analysis, ML, and dashboard work
+Expected validation totals after the load:
 
-## Contribution focus
+- 16,025 rows
+- 0 duplicate `visit_id` values
+- 2,753 missing wait-time values
+- 907 two-hour extended waits
+- 238 four-hour long waits
+
+## Dataset and scope
+
+- **Publisher:** US Centers for Disease Control and Prevention, National Center for Health Statistics
+- **Dataset:** 2022 NHAMCS Emergency Department Public Use File
+- **Unit of observation:** One sampled ED visit
+- **Source:** [CDC NHAMCS documentation](https://www.cdc.gov/nchs/nhamcs/documentation/index.html)
+- **Technical documentation:** [2022 ED public-use file documentation](https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHAMCS/doc22-ed-508.pdf)
+- **Privacy:** Public-use microdata with disclosure protections and no direct patient identifiers in the selected fields
+
+The data supports analysis of an ED visit episode, not a full hospital journey. It does not contain a hospital-department field or patient-level readmission tracking, so the project does not compare departments or report readmission KPIs.
+
+NHAMCS survey weights are retained in the dataset. The dashboard and reported results are unweighted sample statistics and must not be interpreted as national population estimates.
+
+## Contributions
 
 - **Owen:** Python EDA, machine learning, model evaluation, Streamlit dashboard, visual analysis, and final analytics storytelling.
-- **Nimi:** SQL database design, SQL loading and cleaning, KPI queries, reporting views, SQL documentation, and SQL-backed business questions.
-- **Shared:** project scope, business questions, executive summary, business insights, final recommendations, and portfolio-ready documentation.
+- **Nimi:** MySQL schema, loading, cleaning, KPI queries, analytical views, SQL documentation, and SQL-backed business questions.
+- **Shared:** Project scope, business questions, validation, executive summary, business insights, recommendations, and final review.

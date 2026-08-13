@@ -1,0 +1,41 @@
+{
+  "target": "extended_wait_2hr_flag",
+  "features": [
+    "visit_month",
+    "visit_day",
+    "arrival_hour",
+    "age_years",
+    "sex",
+    "residence_type",
+    "arrival_by_ambulance",
+    "ambulance_transfer",
+    "triage_level",
+    "pain_scale",
+    "pulse_bpm",
+    "respiratory_rate",
+    "systolic_bp",
+    "diastolic_bp",
+    "oxygen_saturation",
+    "temperature_f",
+    "chronic_condition_count",
+    "region",
+    "metropolitan_status"
+  ],
+  "excluded_post_arrival_fields": [
+    "admission_destination",
+    "admitted_to_hospital",
+    "died_in_ed",
+    "left_against_medical_advice",
+    "left_before_treatment_complete",
+    "left_without_being_seen",
+    "observation_then_discharged",
+    "observation_then_hospitalized",
+    "visit_length_minutes",
+    "wait_time_minutes"
+  ],
+  "training_rows": 10617,
+  "test_rows": 2655,
+  "test_size": 0.2,
+  "random_state": 42,
+  "selected_model": "random_forest_balanced"
+}
