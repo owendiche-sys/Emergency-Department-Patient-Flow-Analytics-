@@ -198,3 +198,9 @@ NHAMCS survey weights are retained in the dataset. The dashboard and reported re
 - **Owen:** Python EDA, machine learning, model evaluation, Streamlit dashboard, visual analysis, and final analytics storytelling.
 - **Nimi:** MySQL schema, loading, cleaning, KPI queries, analytical views, SQL documentation, and SQL-backed business questions.
 - **Shared:** Project scope, business questions, validation, executive summary, business insights, recommendations, and final review.
+
+## License
+
+The project code and original documentation are available under the [MIT License](LICENSE).
+
+The CDC/NCHS NHAMCS source data and accompanying source documentation are not relicensed by this repository. Their use remains subject to the publisher's applicable terms and public-use documentation.
