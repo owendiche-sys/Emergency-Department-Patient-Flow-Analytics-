@@ -1,7 +1,5 @@
-# Raw and generated data
-data/raw/*
+# Generated processed data (the public-use raw source is intentionally retained)
 data/processed/*
-!data/raw/.gitkeep
 !data/processed/.gitkeep
 !data/processed/nhamcs_2022_visits.csv
 !data/processed/nhamcs_2022_visits_clean.csv
@@ -10,8 +8,10 @@ data/processed/*
 outputs/models/*
 outputs/figures/*
 !outputs/models/.gitkeep
-!outputs/models/week5_wait_prediction_model_metrics.csv
-!outputs/models/week5_wait_target_balance.csv
+!outputs/models/wait_prediction_model_metrics.csv
+!outputs/models/wait_target_balance.csv
+!outputs/models/wait_prediction_feature_importance.csv
+!outputs/models/wait_prediction_metadata.json
 !outputs/figures/.gitkeep
 !outputs/figures/ed_visits_by_month.png
 !outputs/figures/ed_visits_by_day.png
@@ -35,19 +35,6 @@ venv/
 .idea/
 .DS_Store
 Thumbs.db
-
-# Local project planning files
-week1_brief.txt
-week1_breif.txt
-week2_brief.md
-week3_brief.md
-week4_brief.md
-week5_brief.md
-week6_brief.md
-final_review_brief.md
-Emergency_Department_Patient_Flow Analytics_weekly_plan.md
-ed_operations_early_insights.md
-owen_week4_catchup_notes.md
 
 # Temporary render/check files
 tmp/

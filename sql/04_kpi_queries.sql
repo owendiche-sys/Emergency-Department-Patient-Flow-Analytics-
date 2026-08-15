@@ -39,23 +39,19 @@ FROM ed_visits;
 -- Query 2
 -- Median waiting time
 
-SELECT AVG(wait_time_minutes) AS median_wait
+SELECT ROUND(AVG(wait_time_minutes), 2) AS median_wait
 FROM (
-    SELECT wait_time_minutes
+    SELECT
+        wait_time_minutes,
+        ROW_NUMBER() OVER (ORDER BY wait_time_minutes) AS row_num,
+        COUNT(*) OVER () AS row_count
     FROM ed_visits
     WHERE wait_time_minutes IS NOT NULL
-    ORDER BY wait_time_minutes
-    LIMIT 2 - (
-        SELECT COUNT(*)
-        FROM ed_visits
-        WHERE wait_time_minutes IS NOT NULL
-    ) % 2
-    OFFSET (
-        SELECT (COUNT(*) - 1) / 2
-        FROM ed_visits
-        WHERE wait_time_minutes IS NOT NULL
-    )
-) AS median_table;
+) AS ranked_waits
+WHERE row_num IN (
+    FLOOR((row_count + 1) / 2),
+    FLOOR((row_count + 2) / 2)
+);
 
 
 -- Query 3
@@ -81,11 +77,12 @@ FROM ed_visits;
 
 SELECT
 CASE
+    WHEN wait_time_minutes IS NULL THEN 'Missing'
     WHEN wait_time_minutes < 30 THEN 'Under 30 mins'
-    WHEN wait_time_minutes < 60 THEN '30–59 mins'
-    WHEN wait_time_minutes < 120 THEN '1–2 hours'
-    WHEN wait_time_minutes < 240 THEN '2–4 hours'
-    ELSE 'Over 4 hours'
+    WHEN wait_time_minutes < 60 THEN '30-59 mins'
+    WHEN wait_time_minutes < 120 THEN '60-119 mins'
+    WHEN wait_time_minutes <= 240 THEN '120-240 mins'
+    ELSE 'Over 240 mins'
 END AS wait_category,
 COUNT(*) AS patients
 FROM ed_visits
@@ -93,10 +90,11 @@ GROUP BY wait_category
 ORDER BY
 CASE wait_category
     WHEN 'Under 30 mins' THEN 1
-    WHEN '30–59 mins' THEN 2
-    WHEN '1–2 hours' THEN 3
-    WHEN '2–4 hours' THEN 4
-    WHEN 'Over 4 hours' THEN 5
+    WHEN '30-59 mins' THEN 2
+    WHEN '60-119 mins' THEN 3
+    WHEN '120-240 mins' THEN 4
+    WHEN 'Over 240 mins' THEN 5
+    WHEN 'Missing' THEN 6
 END;
 
 
@@ -107,7 +105,7 @@ SELECT
     COUNT(*) AS patients_over_2hrs,
     ROUND(
         COUNT(*) * 100.0 /
-        (SELECT COUNT(*) FROM ed_visits),
+        (SELECT COUNT(*) FROM ed_visits WHERE wait_time_minutes IS NOT NULL),
         2
     ) AS percentage
 FROM ed_visits
@@ -121,11 +119,11 @@ SELECT
     COUNT(*) AS patients_over_4hrs,
     ROUND(
         COUNT(*) * 100.0 /
-        (SELECT COUNT(*) FROM ed_visits),
+        (SELECT COUNT(*) FROM ed_visits WHERE wait_time_minutes IS NOT NULL),
         2
     ) AS percentage
 FROM ed_visits
-WHERE wait_time_minutes >= 240;
+WHERE wait_time_minutes > 240;
 
 
 -- Query 8
@@ -167,23 +165,19 @@ FROM ed_visits;
 -- Query 2
 -- Median visit length
 
-SELECT AVG(visit_length_minutes) AS median_visit_length
+SELECT ROUND(AVG(visit_length_minutes), 2) AS median_visit_length
 FROM (
-    SELECT visit_length_minutes
+    SELECT
+        visit_length_minutes,
+        ROW_NUMBER() OVER (ORDER BY visit_length_minutes) AS row_num,
+        COUNT(*) OVER () AS row_count
     FROM ed_visits
     WHERE visit_length_minutes IS NOT NULL
-    ORDER BY visit_length_minutes
-    LIMIT 2 - (
-        SELECT COUNT(*)
-        FROM ed_visits
-        WHERE visit_length_minutes IS NOT NULL
-    ) % 2
-    OFFSET (
-        SELECT (COUNT(*) - 1) / 2
-        FROM ed_visits
-        WHERE visit_length_minutes IS NOT NULL
-    )
-) AS median_table;
+) AS ranked_visits
+WHERE row_num IN (
+    FLOOR((row_count + 1) / 2),
+    FLOOR((row_count + 2) / 2)
+);
 
 
 -- Query 3
@@ -1224,7 +1218,7 @@ SUM(visit_length_minutes IS NULL) AS visit_length_missing,
 
 SUM(age_years IS NULL) AS age_missing,
 
-SUM(pain_score IS NULL) AS pain_missing,
+SUM(pain_scale IS NULL) AS pain_missing,
 
 SUM(pulse_bpm IS NULL) AS pulse_missing,
 
@@ -1253,7 +1247,7 @@ FROM ed_visits;
 SELECT
 
 ROUND(
-100 * SUM(pain_score IS NULL) / COUNT(*),
+100 * SUM(pain_scale IS NULL) / COUNT(*),
 2
 ) AS pain_missing_pct,
 

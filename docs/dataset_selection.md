@@ -8,7 +8,7 @@
 - **Technical documentation:** https://ftp.cdc.gov/pub/Health_Statistics/NCHS/Dataset_Documentation/NHAMCS/doc22-ed-508.pdf
 - **Access date:** 3 July 2026
 - **Access status:** CDC/NCHS public-use file
-- **GitHub decision:** Keep the original Stata file out of Git; commit the selected, reproducibly prepared CSV with source attribution
+- **Repository decision:** Retain the public-use source file and the selected, reproducibly prepared CSV with clear source attribution
 - **Privacy:** Public-use microdata with disclosure protections; no direct patient identifiers in the selected fields
 
 ## Suitability checks

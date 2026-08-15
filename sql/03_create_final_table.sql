@@ -1,3 +1,16 @@
+/*
+=========================================================
+Project : Emergency Department Patient Flow Analytics
+File    : 03_create_final_table.sql
+Author  : Nimi
+Purpose : Create and validate the typed analytical table
+=========================================================
+*/
+
+USE ed_patient_flow_analytics;
+
+DROP TABLE IF EXISTS ed_visits;
+
 CREATE TABLE ed_visits (
     visit_id                           INT PRIMARY KEY,
     visit_month                        TINYINT,
@@ -145,7 +158,7 @@ SELECT COUNT(*) AS missing_wait_times
 FROM ed_visits
 WHERE wait_time_minutes IS NULL;
 
--- Long wait flag totals
+-- Wait flag totals. Expected: 238 four-hour and 907 two-hour waits.
 SELECT
     SUM(long_wait_4hr_flag) AS long_waits,
     SUM(extended_wait_2hr_flag) AS extended_waits
